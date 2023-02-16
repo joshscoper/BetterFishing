@@ -1,0 +1,6 @@
+name: BetterFishing
+version: ${project.version}
+main: betterfishing.betterfishing.Main
+api-version: 1.19
+authors: [joshscoper]
+description: An innovative fishing system.

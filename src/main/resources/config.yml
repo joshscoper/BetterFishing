@@ -1,0 +1,10 @@
+#Better Fishing by Joshscoper#
+
+config:
+  anti-afk: true
+  difficulty:
+    common: "&7Common"
+    uncommon: "&aUncommon"
+    rare: "&9Rare"
+    epic: "&5Epic"
+    legendary: "&6Legendary"

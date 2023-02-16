@@ -1,0 +1,20 @@
+trout:
+  weight:
+    min: .5
+    max: 20
+  length:
+    min: 1
+    max: 36
+  biome:
+    - "RIVER"
+  item:
+    type: COD
+    meta-data:
+      display-name: "&7&lTrout"
+      lore:
+        - "&fWeight: &7%weight% lbs"
+        - "&fSize: &7%length% inches"
+        - "&fRarity: &7&lCOMMON"
+      custom-model-data: 123
+  rarity: COMMON
+  command: "broadcast %player% caught a trout"
