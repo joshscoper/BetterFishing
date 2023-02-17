@@ -1,5 +1,6 @@
 package betterfishing.betterfishing;
 
+import betterfishing.betterfishing.events.FishingEvent;
 import betterfishing.betterfishing.managers.FileManager;
 import org.bukkit.ChatColor;
 import org.bukkit.configuration.InvalidConfigurationException;
@@ -13,7 +14,7 @@ import java.io.IOException;
 public final class Main extends JavaPlugin {
 
     //Config Initialization
-    private File config;
+    private FileManager config;
     private FileConfiguration c;
 
     //Fish Initialization
@@ -27,6 +28,10 @@ public final class Main extends JavaPlugin {
         fishFileManager = new FileManager(this, "fish.yml");
         fishFile = fishFileManager.getFile();
 
+        config = new FileManager(this, "config.yml");
+        c = config.getFile();
+
+        new FishingEvent(this);
 
         fishFileManager.setupFile();
     }
@@ -36,35 +41,6 @@ public final class Main extends JavaPlugin {
         // Plugin shutdown logic
     }
 
-    //Config
-    public FileConfiguration config() {
-        return this.c;
-    }
-
-    public void loadConfig(){
-        this.config = new File(this.getDataFolder(), "config.yml");
-        if (!this.config.exists()) {
-            this.config.getParentFile().mkdirs();
-            this.saveResource("config.yml", false);
-        }
-
-        this.c = new YamlConfiguration();
-
-        try {
-            this.c.load(this.config);
-        } catch (InvalidConfigurationException | IOException var2) {
-            var2.printStackTrace();
-        }
-    }
-
-    public void saveFile(FileConfiguration fileconfig, File file) {
-        try {
-            fileconfig.save(file);
-        } catch (IOException var4) {
-            var4.printStackTrace();
-        }
-
-    }
 
     public String TCC(String input){return ChatColor.translateAlternateColorCodes('&', input);}
 

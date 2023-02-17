@@ -2,11 +2,16 @@ package betterfishing.betterfishing.managers;
 
 import betterfishing.betterfishing.Main;
 import betterfishing.betterfishing.objects.Fish;
+import betterfishing.betterfishing.util.Difficulty;
+import org.bukkit.Bukkit;
 import org.bukkit.Material;
+import org.bukkit.NamespacedKey;
 import org.bukkit.block.Biome;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
+import org.bukkit.persistence.PersistentDataContainer;
+import org.bukkit.persistence.PersistentDataType;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -27,16 +32,19 @@ public class FishManager{
     public Fish generateFish(){
         Set<String> fishKeys = main.getFishFile().getKeys(false);
         List<String> fishList = new ArrayList<>(fishKeys);
-        int random = new Random(fishKeys.size()).nextInt();
+        int random = new Random().nextInt(fishKeys.size());
         String type = fishList.get(random);
         this.fishKey = type;
 
         Fish fish = new Fish(type);
-        fish.setWeight(generateWeight());
-        fish.setSize(generateSize());
+        this.fish = fish;
+        double weight = generateWeight();
+        weight = Math.round(weight);
+        int length = generateSize();
+        fish.setWeight(weight);
+        fish.setSize(length);
         fish.setDifficulty(main.getFishFile().getString(fishKey + ".rarity"));
         fish.setBiomeList(generateBiomeList());
-        this.fish = fish;
         fish.setItem(fishItem());
 
         return fish;
@@ -84,31 +92,29 @@ public class FishManager{
     private ItemStack fishItem(){
         ItemStack fishItem = new ItemStack(Material.valueOf(main.getFishFile().getString(fishKey+".item.type").toUpperCase()));
 
-        if (main.getFishFile().getKeys(true).contains("meta-data")) {
+        if (main.getFishFile().contains(fishKey + ".item.meta-data")) {
             ItemMeta itemMeta = fishItem.getItemMeta();
             String displayName = main.TCC(main.getFishFile().getString(fishKey + ".item.meta-data.display-name"));
             ArrayList<String> lore = (ArrayList<String>) main.getFishFile().getStringList(fishKey + ".item.meta-data.lore");
             int modelData = main.getFishFile().getInt(fishKey + ".item.meta-data.custom-model-data");
-
-            if (displayName == null) {
-                displayName = fishItem.getType().toString();}
-                if (lore == null) {
-                    lore = new ArrayList<>();}
-
-                    for (int i = 0; i < lore.size(); i++) {
-                        String loreLn = main.TCC(lore.get(i));
-                        loreLn.replaceAll("%weight%", String.valueOf(fish.getWeight()));
-                        loreLn.replaceAll("%length%", String.valueOf(fish.getSize()));
-                        loreLn.replaceAll("%rarity%", String.valueOf(fish.getDifficulty()));
-                        lore.set(i, loreLn);
-                    }
-                    itemMeta.setDisplayName(displayName);
-                    itemMeta.setLore(lore);
-                    itemMeta.setCustomModelData(modelData);
-                    fishItem.setItemMeta(itemMeta);
+            for (int i = 0; i < lore.size(); i++) {
+                String loreLn = lore.get(i);
+                loreLn = loreLn.replaceAll("%weight%", String.valueOf(fish.getWeight()));
+                loreLn = loreLn.replaceAll("%length%", String.valueOf(fish.getSize()));
+                loreLn = loreLn.replaceAll("%rarity%", Difficulty.valueOf(fish.getDifficulty()).getDisplayName());
+                lore.set(i, main.TCC(loreLn));
+            }
+              itemMeta.setDisplayName(displayName);
+              itemMeta.setLore(lore);
+              itemMeta.setCustomModelData(modelData);
+              PersistentDataContainer dataContainer = itemMeta.getPersistentDataContainer();
+              dataContainer.set(new NamespacedKey(main, "better-fishing"), PersistentDataType.STRING,"better-fishing");
+              fishItem.setItemMeta(itemMeta);
         }
         return fishItem;
     }
+
+
 
     public boolean checkBiome(Biome biome){
         Boolean isBiome;
